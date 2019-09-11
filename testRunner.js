@@ -45,12 +45,12 @@ function testRunner(shownCode, editedCode, hiddenCode) {
   let editedCodeNew = `const Vue = require("./node_modules/vue");\n 
                       Vue.config.silent = true \n` + editedCode;
   // writeFileSync function with filename, content and callback function
-  fs.writeFileSync("/tmp/example/example.js", editedCodeNew, function(err) {
+  fs.writeFileSync("/tmp/example/main.js", editedCodeNew, function(err) {
     if (err) throw err;
     console.log("File is created successfully.");
   });
 
-  fs.writeFileSync("/tmp/example/example.test.js", shownCode, function(err) {
+  fs.writeFileSync("/tmp/example/main.spec.js", shownCode, function(err) {
     if (err) throw err;
     console.log("File is created successfully.");
   });
