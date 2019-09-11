@@ -83,6 +83,7 @@ Editable Block - JS Source code - layoutItems[0] -->
             return response.json()
         }).then(data => {
             this.answer = JSON.parse(JSON.stringify(data));
+              this.answer.jsonFeedback = JSON.stringify(this.answer.jsonFeedback,null,2);
               this.isHidden = false;
               this.submitText = "Submit";
               if (this.answer && this.answer.isComplete) {
@@ -129,7 +130,7 @@ Editable Block - JS Source code - layoutItems[0] -->
                 <div class="md-layout-item md-size-33">
                   <div style="border: 1px solid #eeeeee">
                     <label><b>main.spec.js</b></label>
-                    <codemirror class="shownTextarea" v-model="layoutItems[1].vModel" :options="cmOptions"></codemirror>
+                    <codemirror class="shownTextarea" v-model="layoutItems[1].vModel" :options="cmReadOnly"></codemirror>
                   </div>
                 </div>
                 <div class="md-layout-item md-size-33">
@@ -183,27 +184,27 @@ Editable Block - JS Source code - layoutItems[0] -->
             questions:[
                 {name:"question 1", layoutItems: [
                 {vModel: js_beautify(`//main.js \n var app=new Vue({el:"#app",data:{user:"Chris",temp:95}});module.exports=app;`)},
-                {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object")});it("sets the correct default data",()=>{expect(typeof app).toBe("object"),expect(2).toEqual(2),expect(app.user).toEqual("Chris")})});`)},  
+                {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object");});it("sets the correct default data",()=>{expect(typeof app).toBe("object");expect(2).toEqual(2);expect(app.user).toEqual("Chris");});});`)},  
                 {vModel: js_beautify(`{\n"scripts":{ "test":"jest" }\n}`)}                  
                 ], status:" 🔴"},
                 {name:"question 2", layoutItems: [
                 {vModel: js_beautify(`//main.js \n var app=new Vue({el:"#app",data:{user:"Chris",temp:95}});module.exports=app;`)},
-                {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object")});it("sets the correct default data",()=>{expect(typeof app).toBe("object"),expect(2).toEqual(2),expect(app.user).toEqual("Chris")})});`)},  
+                {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object");});it("sets the correct default data",()=>{expect(typeof app).toBe("object");expect(2).toEqual(2);expect(app.user).toEqual("Chris");});});`)},  
                 {vModel: js_beautify(`{\n"scripts":{ "test":"jest" }\n}`)}                  
                 ], status:" 🔴"},
                 {name:"question 3", layoutItems: [
                 {vModel: js_beautify(`//main.js \n var app=new Vue({el:"#app",data:{user:"Chris",temp:95}});module.exports=app;`)},
-                {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object")});it("sets the correct default data",()=>{expect(typeof app).toBe("object"),expect(2).toEqual(2),expect(app.user).toEqual("Chris")})});`)},  
+                {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object");});it("sets the correct default data",()=>{expect(typeof app).toBe("object");expect(2).toEqual(2);expect(app.user).toEqual("Chris");});});`)},  
                 {vModel: js_beautify(`{\n"scripts":{ "test":"jest" }\n}`)}                  
                 ], status:" 🔴"},
                 {name:"question 4", layoutItems: [
                 {vModel: js_beautify(`//main.js \n var app=new Vue({el:"#app",data:{user:"Chris",temp:95}});module.exports=app;`)},
-                {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object")});it("sets the correct default data",()=>{expect(typeof app).toBe("object"),expect(2).toEqual(2),expect(app.user).toEqual("Chris")})});`)},  
+                {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object");});it("sets the correct default data",()=>{expect(typeof app).toBe("object");expect(2).toEqual(2);expect(app.user).toEqual("Chris");});});`)},  
                 {vModel: js_beautify(`{\n"scripts":{ "test":"jest" }\n}`)}                  
                 ], status:" 🔴"},
                 {name:"question 5", layoutItems: [
                 {vModel: js_beautify(`//main.js \n var app=new Vue({el:"#app",data:{user:"Chris",temp:95}});module.exports=app;`)},
-                {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object")});it("sets the correct default data",()=>{expect(typeof app).toBe("object"),expect(2).toEqual(2),expect(app.user).toEqual("Chris")})});`)},  
+                {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object");});it("sets the correct default data",()=>{expect(typeof app).toBe("object");expect(2).toEqual(2);expect(app.user).toEqual("Chris");});});`)},  
                 {vModel: js_beautify(`{\n"scripts":{ "test":"jest" }\n}`)}                  
                 ], status:" 🔴"}
                 ]

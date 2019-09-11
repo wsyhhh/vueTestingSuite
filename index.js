@@ -23,7 +23,7 @@ exports.handler = async event => {
     const hiddenCode = parsedBodyContent["hidden"]["0"];
 
     let allFeedback = testRunner(shownCode, editedCode, hiddenCode);
-
+    
     return {
       statusCode: 200,
       headers: {
