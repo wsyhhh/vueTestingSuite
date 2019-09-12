@@ -42,6 +42,7 @@ Editable Block - JS Source code - layoutItems[0] -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.4/mode/javascript/javascript.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-codemirror@4.0.6/dist/vue-codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.10.2/beautify.min.js"></script>
+    <script src="https://codemirror.net/addon/scroll/simplescrollbars.js"></script>
     <script>
     Vue.use(VueMaterial.default)
     Vue.use(window.VueCodemirror)
@@ -49,7 +50,7 @@ Editable Block - JS Source code - layoutItems[0] -->
         props: ['layoutThings', 'questionName'],
         data: function () {
             return {
-            answer:"",
+            answer:{jsonFeedback:{},htmlFeedback:'',textFeedback:'',isComplete:false},
             layoutItems: this.layoutThings,
             isHidden: true,
             submitText: "Submit",
@@ -62,6 +63,12 @@ Editable Block - JS Source code - layoutItems[0] -->
               lineNumbers: true,
               mode:  "javascript",
               readOnly: true
+            },
+            cmInstructions:{
+              lineNumbers: false,
+              mode: "text",
+              readOnly: true,
+              scrollbarStyle: "simple"
             }
         }
         },
@@ -69,40 +76,79 @@ Editable Block - JS Source code - layoutItems[0] -->
             postContents: function () {
             // comment: leaving the gatewayUrl empty - API will post back to itself
             const gatewayUrl = '';
-            this.submitText = "Loading...";
-            this.answer = "";
-            this.isHidden = true;
+            this.$set(this, 'submitText', 'Loading...');
+            this.$set(this, 'answer', {jsonFeedback:{},htmlFeedback:'',textFeedback:'',isComplete:false});
+            this.$set(this, 'isHidden', true);
             fetch(gatewayUrl, {
         method: "POST",
         headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
         },
-        body: JSON.stringify({userToken: "ABCDE", shown:{0:this.layoutItems[1].vModel},editable:{0:this.layoutItems[0].vModel},hidden: {0: this.layoutItems[2].vModel}})
+        body: JSON.stringify({userToken: "ABCDE", shown:{0:this.layoutItems[2].vModel},editable:{0:this.layoutItems[1].vModel},hidden: {0: this.layoutItems[3].vModel}})
         }).then(response => {
             return response.json()
         }).then(data => {
-            this.answer = JSON.parse(JSON.stringify(data));
-              this.answer.jsonFeedback = JSON.stringify(this.answer.jsonFeedback,null,2);
-              this.isHidden = false;
-              this.submitText = "Submit";
+            let temp = JSON.parse(JSON.stringify(data));
+            temp.jsonFeedback = JSON.stringify(this.answer.jsonFeedback,null,2);
+            this.$set(this, 'answer', temp);
+            this.$set(this, 'isHidden', false);
+            this.$set(this, 'submitText', 'Submit');
               if (this.answer && this.answer.isComplete) {
-                this.isCorrectColor = "green";
+                this.$set(this, 'isCorrectColor', 'green');
               } else {
-                this.isCorrectColor = "#ff5252";
+                this.$set(this, 'isCorrectColor', '#ff5252');
               }
             return this.$emit('questionhandler',{data, questionName:this.questionName})
             })
          }
         },
-        template:  `
-      <div class="md-layout">
-        <div class="md-layout-item md-size-100">
-          <md-card class="input-card">
-            <md-card-header>
-              <md-card-header-text>
-                <div class="md-layout md-gutter">
-                  <div class="md-layout-item md-size-50">
+        template:  `<div class="md-layout">
+          <div class="md-layout-item md-size-100">
+            <div class="md-layout md-gutter">
+              <div class="md-layout-item md-size-50">
+                <md-card class="input-card">
+                  <md-card-header>
+                    <md-card-header-text
+                      ><div class="md-subheading"><b>Introduction</b></div>
+                    </md-card-header-text>
+                  </md-card-header>
+                  <md-card-content>
+                    <codemirror
+                      class="instructionTextarea"
+                      v-model="layoutItems[0].vModel"
+                      :options="cmInstructions"
+                    ></codemirror>
+                  </md-card-content>
+                </md-card>
+              </div>
+              <div class="md-layout-item md-size-50">
+                <md-card class="input-card">
+                  <md-card-header>
+                    <md-card-header-text
+                      ><div class="md-subheading"><b>Tests</b></div>
+                    </md-card-header-text>
+                  </md-card-header>
+                  <md-card-content>
+                    <codemirror
+                      class="shownTextarea"
+                      v-model="layoutItems[2].vModel"
+                      :options="cmReadOnly"
+                    ></codemirror>
+                  </md-card-content>
+                </md-card>
+              </div>
+            </div>
+          </div>
+          <br />
+          <div class="md-layout-item md-size-100" style="margin-top:10px;">
+            <div class="md-layout md-gutter">
+              <div class="md-layout-item md-size-50">
+                <md-card class="input-card">
+                  <md-card-header>
+                    <md-card-header-text
+                      ><div class="md-subheading"><b>Editable code</b></div>
+                    </md-card-header-text>
                     <button class="button" id="submit" v-on:click="postContents">
                       <span>{{ submitText }}</span>
                     </button>
@@ -115,67 +161,55 @@ Editable Block - JS Source code - layoutItems[0] -->
                         answer && answer.isComplete ? "Passed" : "Failed"
                       }}</span>
                     </button>
-                  </div>
-                </div>
-              </md-card-header-text>
-            </md-card-header>
-            <md-card-content>
-              <div class="md-layout md-gutter">
-                <div class="md-layout-item md-size-33">
-                  <div style="border: 1px solid #eeeeee">
-                    <label><b>[Edit your code] : main.js</b></label>
-                    <codemirror class="editableTextarea" v-model="layoutItems[0].vModel" :options="cmOptions"></codemirror>
-                  </div>
-                </div>
-                <div class="md-layout-item md-size-33">
-                  <div style="border: 1px solid #eeeeee">
-                    <label><b>main.spec.js</b></label>
-                    <codemirror class="shownTextarea" v-model="layoutItems[1].vModel" :options="cmReadOnly"></codemirror>
-                  </div>
-                </div>
-                <div class="md-layout-item md-size-33">
-                  <div style="border: 1px solid #eeeeee">
-                    <label><b>config</b></label>
-                    <codemirror class="hiddenTextarea" v-model="layoutItems[2].vModel" :options="cmReadOnly"></codemirror>
-                  </div>
-                </div>
+                  </md-card-header>
+                  <md-card-content>
+                    <codemirror
+                      class="editableTextarea"
+                      v-model="layoutItems[1].vModel"
+                      :options="cmOptions"
+                    ></codemirror>
+                  </md-card-content>
+                </md-card>
               </div>
-            </md-card-content>
-          </md-card>
-        </div>
-        <div class="md-layout-item md-size-100 output-card">
-          <md-card>
-            <md-card-header>
-              <md-card-header-text>
-                <div class="md-title">Results</div>
-              </md-card-header-text>
-            </md-card-header>
-            <md-card-content>
-              <md-field>
-                <md-tabs>
-                  <md-tab id="tab-htmlResults" md-label="HTML results">
-                    <div class="output-tab" v-html="answer.htmlFeedback"></div>
-                  </md-tab>
-                  <md-tab id="tab-jsonResults" md-label="JSON results">
-                    <md-textarea
-                      class="output-tab"
-                      v-model="answer.jsonFeedback"
-                      readonly
-                    ></md-textarea>
-                  </md-tab>
-                  <md-tab id="tab-textResults" md-label="Text results">
-                    <md-textarea
-                      class="output-tab"
-                      v-model="answer.textFeedback"
-                      readonly
-                    ></md-textarea>
-                  </md-tab>
-                </md-tabs>
-              </md-field>
-            </md-card-content>
-          </md-card>
-        </div>
-      </div>`
+              <div class="md-layout-item md-size-50">
+                <md-card>
+                  <md-card-header>
+                    <md-card-header-text>
+                      <div class="md-subheading"><b>Output</b></div>
+                    </md-card-header-text>
+                  </md-card-header>
+                  <md-card-content>
+                    <md-field>
+                      <md-tabs class="output-tabs">
+                        <md-tab id="tab-htmlResults" md-label="HTML results">
+                          <div
+                            class="output-tab"
+                            v-html="answer.htmlFeedback"
+                            style="overflow: scroll;"
+                          ></div>
+                        </md-tab>
+                        <md-tab id="tab-jsonResults" md-label="JSON results">
+                          <md-textarea
+                            class="output-tab"
+                            v-model="answer.jsonFeedback"
+                            readonly
+                          ></md-textarea>
+                        </md-tab>
+                        <md-tab id="tab-textResults" md-label="Text results">
+                          <md-textarea
+                            class="output-tab"
+                            v-model="answer.textFeedback"
+                            readonly
+                          ></md-textarea>
+                        </md-tab>
+                      </md-tabs>
+                    </md-field>
+                  </md-card-content>
+                </md-card>
+              </div>
+            </div>
+          </div>
+        </div>`
     })
     new Vue({
       el: "#app",
@@ -183,26 +217,31 @@ Editable Block - JS Source code - layoutItems[0] -->
             return {
             questions:[
                 {name:"question 1", layoutItems: [
+                {vModel: js_beautify(`Edit your code to pass the tests! All the best!`)},
                 {vModel: js_beautify(`//main.js \n var app=new Vue({el:"#app",data:{user:"Chris",temp:95}});module.exports=app;`)},
                 {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object");});it("sets the correct default data",()=>{expect(typeof app).toBe("object");expect(2).toEqual(2);expect(app.user).toEqual("Chris");});});`)},  
                 {vModel: js_beautify(`{\n"scripts":{ "test":"jest" }\n}`)}                  
                 ], status:" 🔴"},
                 {name:"question 2", layoutItems: [
+                {vModel: js_beautify(`Edit your code to pass the tests! All the best!`)},
                 {vModel: js_beautify(`//main.js \n var app=new Vue({el:"#app",data:{user:"Chris",temp:95}});module.exports=app;`)},
                 {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object");});it("sets the correct default data",()=>{expect(typeof app).toBe("object");expect(2).toEqual(2);expect(app.user).toEqual("Chris");});});`)},  
                 {vModel: js_beautify(`{\n"scripts":{ "test":"jest" }\n}`)}                  
                 ], status:" 🔴"},
                 {name:"question 3", layoutItems: [
+                {vModel: js_beautify(`Edit your code to pass the tests! All the best!`)},
                 {vModel: js_beautify(`//main.js \n var app=new Vue({el:"#app",data:{user:"Chris",temp:95}});module.exports=app;`)},
                 {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object");});it("sets the correct default data",()=>{expect(typeof app).toBe("object");expect(2).toEqual(2);expect(app.user).toEqual("Chris");});});`)},  
                 {vModel: js_beautify(`{\n"scripts":{ "test":"jest" }\n}`)}                  
                 ], status:" 🔴"},
                 {name:"question 4", layoutItems: [
+                {vModel: js_beautify(`Edit your code to pass the tests! All the best!`)},
                 {vModel: js_beautify(`//main.js \n var app=new Vue({el:"#app",data:{user:"Chris",temp:95}});module.exports=app;`)},
                 {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object");});it("sets the correct default data",()=>{expect(typeof app).toBe("object");expect(2).toEqual(2);expect(app.user).toEqual("Chris");});});`)},  
                 {vModel: js_beautify(`{\n"scripts":{ "test":"jest" }\n}`)}                  
                 ], status:" 🔴"},
                 {name:"question 5", layoutItems: [
+                {vModel: js_beautify(`Edit your code to pass the tests! All the best!`)},
                 {vModel: js_beautify(`//main.js \n var app=new Vue({el:"#app",data:{user:"Chris",temp:95}});module.exports=app;`)},
                 {vModel: js_beautify(`//main.spec.js \n const app=require("./main");describe("Load app from main.js",()=>{it("has a created hook",()=>{expect(typeof app).toBe("object");});it("sets the correct default data",()=>{expect(typeof app).toBe("object");expect(2).toEqual(2);expect(app.user).toEqual("Chris");});});`)},  
                 {vModel: js_beautify(`{\n"scripts":{ "test":"jest" }\n}`)}                  
@@ -236,18 +275,15 @@ Editable Block - JS Source code - layoutItems[0] -->
       width: 100%;
     }
     .md-tab {
-      min-height: 800px;
+      min-height: 600px;
     }
     .md-content {
-      min-height: 1200px !important;
+      min-height: 200px !important;
     }
     .md-card {
       overflow: hidden;
     }
-    .input-card {
-      height: 400px;
-    }
-    .output-card > .md-card > .md-card-content > .md-field {
+    .md-field {
       padding-top: 0px;
     }
     .button {
@@ -288,12 +324,20 @@ Editable Block - JS Source code - layoutItems[0] -->
       display: none;
     }
     .output-tab {
-      min-height: 1000px !important;
+      min-height: 150px !important;
+      max-height: 150px !important;
+      overflow: scroll;
     }
     h1{
-        margin-top: 1rem;
-        padding:20px;
-        text-align: center
+      margin-top: 1rem;
+      padding:20px;
+      text-align: center
     }  
+    .CodeMirror {
+      height: 150px;
+    }
+    .CodeMirror-overlayscroll-vertical {
+      display: block !important;
+    }
   </style>
 </html>
