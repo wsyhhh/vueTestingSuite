@@ -7,14 +7,14 @@ Vue Testing Suite enables a user to create an AWS Lambda function with Vue testi
 ## AWS Lambda Function
 **AWS Lambda Function Configuration details -** 
 
-|               | Value                       |
-| --------------|:---------------------------:|
-| Function name | vueTest                     |
-| Runtime       | Node.js 10.x                |
-| Execution role| lambda_basic_execution role |
-| Memory (MB)   | 1024 MB                     |
-| Timeout       | 40 sec                      |
-| Trigger       | API Gateway                 |
+| -                 | Value                       |
+| ------------------|:---------------------------:|
+| **Function name** | vueTest                     |
+| **Runtime**       | Node.js 10.x                |
+| **Execution role**| lambda_basic_execution role |
+| **Memory (MB)**   | 1024 MB                     |
+| **Timeout**       | 40 sec                      |
+| **Trigger**       | API Gateway                 |
 
 ## Deployment
 User can deploy using - 
