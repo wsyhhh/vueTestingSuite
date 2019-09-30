@@ -42,7 +42,8 @@ function testRunner(shownCode, editedCode, hiddenCode) {
   //Setup the lambda environment
   initialSetup();
 
-  let editedCodeNew = `const Vue = require("./node_modules/vue");\n 
+  let editedCodeNew = `const fetch = require("./node_modules/node-fetch");\n
+                      const Vue = require("./node_modules/vue");\n 
                       Vue.config.silent = true \n` + editedCode;
   // writeFileSync function with filename, content and callback function
   fs.writeFileSync("/tmp/example/main.js", editedCodeNew, function(err) {
@@ -50,6 +51,7 @@ function testRunner(shownCode, editedCode, hiddenCode) {
     console.log("File is created successfully.");
   });
 
+  //let shownCodeNew = `const fetch = require("./node_modules/node-fetch");\n` + shownCode;
   fs.writeFileSync("/tmp/example/main.spec.js", shownCode, function(err) {
     if (err) throw err;
     console.log("File is created successfully.");
