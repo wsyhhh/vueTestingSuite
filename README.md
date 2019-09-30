@@ -25,12 +25,13 @@ This repository supports auto-deployment of the lambda function on every push to
 
    Here's an example S3 bucket with the required permissions -
    ![S3 bucket policy](./docs/Bucket-policy.png)
+   
 ### Steps to deploy -
 1. Fork the repository and clone the contents
    ```bash
    git clone https://github.com/<your-username>/vueTestingSuite
    ```
-2. Navigate to Repository settings > Click on secrets
+2. Navigate to Repository settings on the GitHub console > Click on secrets
 3. Add the following secret key value pairs - 
    ```python
    AWS_ACCESS_KEY_ID = # AWS users credential details
@@ -41,6 +42,7 @@ This repository supports auto-deployment of the lambda function on every push to
    
    The following Github secrets must be created -
    ![Github Secrets](./docs/Github-secrets.png)
+   
 4. Make changes to your Lambda function code in the src directory. Commit and push
    ```bash
    git add .
@@ -48,7 +50,9 @@ This repository supports auto-deployment of the lambda function on every push to
    git push
    ```
 3. On push, GitHub Action is trigerred and the status of the deployments can be viewed under the actions tab.
+   ![Github Secrets](./docs/Github-actions.png)
 
+***
 
 **Note:** 
 For AWS Educate Users, users credentials expire and will have to be overwritten in the project secrets settings on github in case of expiry before an update.
